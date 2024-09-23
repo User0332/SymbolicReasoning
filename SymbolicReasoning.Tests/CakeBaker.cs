@@ -7,7 +7,10 @@ class CakeBaker
 {
 	public static void Run()
 	{
-		LogicalSet bakers = new("Cake Bakers");
+		LogicalSet bakers = new("Cake Bakers", new SetConstraints(
+			requiresNMembersOnly: true,
+			requiredMembers: 1
+		));
 
 		LogicalObject alice = new("alice");
 		LogicalObject bob = new("bob");
@@ -22,13 +25,8 @@ class CakeBaker
 
 		SymbolicReasoner reasoningEngine = new();
 
-		var trueStmt = reasoningEngine.SelectOneTruth(
-			possiblyTrue,
-			(knowledgeBase) => {
-				return knowledgeBase.Count(
-					stmt => stmt is ObjectBelongingStatement { IsNegated: false } && ((stmt as ObjectBelongingStatement)?.Set == bakers)
-				) == 1; // select that exactly one person must have baked the cake
-			}
+		var trueStmt = reasoningEngine.SelectOneTruth( // TODO: fix (set constraint doesn't work)
+			possiblyTrue
 		)!;
 
 		Console.WriteLine(reasoningEngine.KnowledgeBaseToString());

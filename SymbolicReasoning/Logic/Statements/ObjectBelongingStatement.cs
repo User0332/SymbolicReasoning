@@ -39,4 +39,12 @@ public class ObjectBelongingStatement(LogicalObject obj, LogicalSet set, bool ne
 	{
 		return new ObjectBelongingStatement(Object, Set, !IsNegated);
 	}
+
+	public void Apply()
+	{
+		if (!IsNegated)
+		{
+			Set.AddMember(Object);
+		}
+	}
 }

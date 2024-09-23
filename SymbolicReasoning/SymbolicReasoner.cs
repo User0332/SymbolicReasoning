@@ -7,8 +7,27 @@ namespace SymbolicReasoning;
 public class SymbolicReasoner
 {
 	readonly HashSet<IStatement> knowledgeBase = [];
+	readonly HashSet<LogicalSet> knownSets = [];
 
-	public void AddAxiom(IStatement axoim) => knowledgeBase.Add(axoim);
+	public bool SetConstraintHasBeenViolated => knownSets.Any(set => set.Constraints.IsViolated);
+
+	public void AddAxiom(IStatement axoim)
+	{
+		knowledgeBase.Add(axoim);
+		knownSets.UnionWith(axoim.ReferencedSets);
+	}
+
+	public void ReloadSetMembers()
+	{
+		var objBelongingStmts = knowledgeBase.Where(stmt => stmt is ObjectBelongingStatement { IsNegated: false });
+
+		foreach (var set in knownSets) set.ClearMembers();
+
+		foreach (var stmt in objBelongingStmts)
+		{
+			((ObjectBelongingStatement) stmt).Apply(); // adds the object to the set
+		}
+	}
 
 	public string KnowledgeBaseToString()
 	{
@@ -26,31 +45,35 @@ public class SymbolicReasoner
 	{
 		extraSelector ??= _ => true;
 
-		HashSet<IStatement> oldKnowledge = new(knowledgeBase); 
+		HashSet<IStatement> oldKnowledge = new(knowledgeBase);
+
+		SymbolicReasoner newReasoner = new();
 	
 		foreach (var possibleTruth in possibleTruths)
 		{
-			knowledgeBase.Add(possibleTruth); // assume this as true, try to find a contradiction
+			newReasoner.knowledgeBase.UnionWith(oldKnowledge);
+
+			newReasoner.AddAxiom(possibleTruth); // assume this as true, try to find a contradiction
 			
 			foreach (var otherStmt in possibleTruths) // assume everything else is false
 			{
 				if (otherStmt == possibleTruth) continue;
 
-				knowledgeBase.Add(otherStmt.Negate());
+				newReasoner.AddAxiom(otherStmt.Negate());
 			}
 
 			int lastNumTruths = 0;
 			bool contradiction = false;
 
-			while (lastNumTruths != knowledgeBase.Count) // if the number of truths did not change after forward chaining, then we have deduced all truths
+			while (lastNumTruths != newReasoner.knowledgeBase.Count) // if the number of truths did not change after forward chaining, then we have deduced all truths
 			{
-				lastNumTruths = knowledgeBase.Count;
+				lastNumTruths = newReasoner.knowledgeBase.Count;
 
-				ForwardChain(1);
+				newReasoner.ForwardChain(1);
 
-				foreach (var stmt in knowledgeBase) // try to find a contradiction, TODO: optimize
+				foreach (var stmt in newReasoner.knowledgeBase) // try to find a contradiction, TODO: optimize
 				{
-					if (knowledgeBase.Contains(stmt.Negate())) 
+					if (newReasoner.knowledgeBase.Contains(stmt.Negate())) 
 					{
 						contradiction = true;
 						break;
@@ -58,13 +81,18 @@ public class SymbolicReasoner
 				}
 			}
 
-			if (!contradiction && extraSelector(knowledgeBase)) // if this is true, then keep everything in the knowledge base, don't remove it (code to reset knowledge base is below)
+			newReasoner.ReloadSetMembers();
+
+			if (!contradiction && extraSelector(newReasoner.knowledgeBase) && !newReasoner.SetConstraintHasBeenViolated)
 			{
+				knowledgeBase.UnionWith(newReasoner.knowledgeBase); // if this is true, then add everything to main knowledge base
+				knownSets.UnionWith(newReasoner.knownSets);
+
 				return possibleTruth;
 			}
 
-			knowledgeBase.Clear();
-			knowledgeBase.UnionWith(oldKnowledge);
+			newReasoner.knowledgeBase.Clear();
+			newReasoner.knownSets.Clear(); // technically not necessary since the sets wont change but leave here for now for clarity
 		}
 
 		return null;
@@ -98,7 +126,9 @@ public class SymbolicReasoner
 				}
 			}
 
-			if (!contradiction && extraSelector(knowledgeBase)) // if this is true, then keep everything in the knowledge base by adding these conclusions to oldKnowledge
+			ReloadSetMembers();
+
+			if (!contradiction && extraSelector(knowledgeBase) && !SetConstraintHasBeenViolated) // if this is true, then keep everything in the knowledge base by adding these conclusions to oldKnowledge
 			{
 				trueStatements.Add(possibleTruth);
 				oldKnowledge.UnionWith(knowledgeBase);
@@ -212,6 +242,16 @@ public class SymbolicReasoner
 		if (BackwardChainBase(query))
 		{
 			knowledgeBase.Add(query);
+
+			ReloadSetMembers();
+
+			if (SetConstraintHasBeenViolated)
+			{
+				knowledgeBase.Remove(query);
+
+				return false;
+			}
+
 			return true;
 		}
 

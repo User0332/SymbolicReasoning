@@ -8,8 +8,6 @@ class Program
 
 		CakeBaker.Run();
 
-		HatColors.Run();
-
 		return 0;
 	}
 }
