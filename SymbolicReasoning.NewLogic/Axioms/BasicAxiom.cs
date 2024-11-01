@@ -3,11 +3,11 @@ using SymbolicReasoning.NewLogic.Statements;
 
 namespace SymbolicReasoning.NewLogic.Axioms;
 
-public class BasicAxiom<TPostulate>(
-	Func<TPostulate, TPostulate> transformer
-) : IAxiom<TPostulate> where TPostulate : IPostulate
+public class BasicAxiom(
+	Func<IPostulate, IPostulate?> transformer
+)
 {
-	public TPostulate Apply(TPostulate postulate)
+	public IPostulate? Apply(IPostulate postulate)
 	{
 		return transformer(postulate);
 	}

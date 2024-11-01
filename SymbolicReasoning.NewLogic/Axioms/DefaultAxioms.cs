@@ -5,9 +5,15 @@ namespace SymbolicReasoning.NewLogic.Axioms;
 
 public static class DefaultAxioms
 {
-	public static readonly BasicAxiom<MatchPostulate> AxiomOfContrapositivity = new(
+	public static readonly BasicAxiom AxiomOfContrapositivity = new(
 		(inPostulate) => {
-			return new(new NotStatement(inPostulate.Result), new NotStatement(inPostulate.Predicate));
+			if (inPostulate is not MatchPostulate matchPostulate) return null; // if this is not a match postulate, we cannot safely draw any conclusions
+
+			return new MatchPostulate(new NotStatement(matchPostulate.Result), new NotStatement(matchPostulate.Predicate));
 		}
 	);
+
+	// public static readonly BasicAxiom AxiomOfInseparability = new(
+
+	// );
 }

@@ -2,7 +2,7 @@ using SymbolicReasoning.NewLogic.Postulates;
 
 namespace SymbolicReasoning.NewLogic.Axioms;
 
-public interface IAxiom<TPostulate> where TPostulate : IPostulate
+public interface IAxiom
 {
-	public TPostulate Apply(TPostulate postulate);
+	public IPostulate? Apply(IPostulate postulate);
 }
