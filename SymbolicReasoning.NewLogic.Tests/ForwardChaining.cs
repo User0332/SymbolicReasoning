@@ -26,7 +26,7 @@ class ForwardChaining
 
 		List<Statement> statements = [
 			new BinaryRelationStatement(George, BelongsTo, Biologists),
-			new BinaryRelationStatement(Grunkle, BelongsTo, Aliens)
+			// new BinaryRelationStatement(Grunkle, BelongsTo, Aliens)
 		];
 
 		var engine = new SimpleReasoningEngine();
@@ -58,13 +58,13 @@ class ForwardChaining
 			Console.WriteLine(stmt);
 		}
 
-		engine.ForwardChainStatements();
+		engine.ForwardChainStatementsAllGens();
 
 		Console.WriteLine('\n');
 
 		foreach (var stmt in engine.KnowledgeBase.Statements)
 		{
-			Console.WriteLine((stmt, stmt.GetHashCode()));
+			Console.WriteLine(stmt);
 		}
 	}
 }

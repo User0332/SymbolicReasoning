@@ -1,4 +1,5 @@
-﻿using SymbolicReasoning.NewLogic.Axioms;
+﻿using System.Runtime.InteropServices;
+using SymbolicReasoning.NewLogic.Axioms;
 using SymbolicReasoning.NewLogic.Statements;
 
 namespace SymbolicReasoning.NewLogic;
@@ -46,21 +47,21 @@ public class SimpleReasoningEngine(KnowledgeBase knowledgeBase)
 		}
 	}
 
-	public void ForwardChainStatements()
+	public void ForwardChainStatementsOneGen()
 	{
 		var stmtsCopy = KnowledgeBase.Statements.ToArray();
 
 		foreach (var stmt in stmtsCopy)
 		{
-			/* truth of combination */
-			foreach (var otherStmt in stmtsCopy)
-			{
-				if (stmt.Equals(otherStmt)) continue;
+			/* truth of combination -- REMOVING - this generates too many permutations (n!) and therefore is too resource-consuming; there should be a matching function for postulates with AND conditions instead */
+			// foreach (var otherStmt in stmtsCopy)
+			// {
+			// 	if (stmt.Equals(otherStmt)) continue;
 				
-				var newStmt = new AndStatement(stmt, otherStmt);
+			// 	var newStmt = new AndStatement(stmt, otherStmt).Simplify();
 
-				KnowledgeBase.Statements.Add(newStmt);
-			}
+			// 	KnowledgeBase.Statements.Add(newStmt);
+			// }
 			
 			foreach (var postulate in KnowledgeBase.Postulates)
 			{
@@ -70,6 +71,23 @@ public class SimpleReasoningEngine(KnowledgeBase knowledgeBase)
 
 				KnowledgeBase.Statements.Add(newStmt);
 			}
+		}
+	}
+
+	public void ForwardChainStatementsAllGens()
+	{
+		int lastNumStmts = 0;
+		int numStmts = KnowledgeBase.Statements.Count;
+
+		while (numStmts > lastNumStmts)
+		{
+			lastNumStmts = numStmts;
+
+			ForwardChainStatementsOneGen();
+
+			numStmts = KnowledgeBase.Statements.Count;
+
+			Console.WriteLine($"Generation complete, {numStmts} statements known");
 		}
 	}
 

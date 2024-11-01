@@ -6,7 +6,7 @@ public class NotStatement(Statement inner) : Statement
 {
 	const int NotStatementHashMask = 12092491;
 	public override int ArgsConsumed => Inner.ArgsConsumed;
-	public readonly Statement Inner = inner;
+	public readonly Statement Inner = inner.Simplify();
 
 	public override LogicalEntity[] GetArgRef()
 	{
@@ -35,7 +35,7 @@ public class NotStatement(Statement inner) : Statement
 
 	public override int GetHashCode()
 	{
-		return HashCode.Combine(Inner.Simplify(), NotStatementHashMask);
+		return HashCode.Combine(Inner, NotStatementHashMask);
 	}
 
 	public override string ToString()

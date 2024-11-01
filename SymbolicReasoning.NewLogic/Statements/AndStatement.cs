@@ -37,6 +37,28 @@ public sealed class AndStatement : Statement
 		}
 	}
 
+	// Private/Already simplified constituent ctor
+	AndStatement(Statement leftSimpl, Statement rightSimpl, bool _)
+	{
+		var leftHashCode = leftSimpl.GetHashCode();
+		var rightHashCode = rightSimpl.GetHashCode();
+
+		if (leftHashCode < rightHashCode)
+		{
+			First = leftSimpl;
+			Second = rightSimpl;
+
+			hashCode = HashCode.Combine(leftHashCode, rightHashCode, AndStatementHashMask);
+		}
+		else
+		{
+			First = rightSimpl;
+			Second = leftSimpl;
+		
+			hashCode = HashCode.Combine(rightHashCode, leftHashCode, AndStatementHashMask);		
+		}
+	}
+
 	public override LogicalEntity[] GetArgRef()
 	{
 		return [..First.GetArgRef(), ..Second.GetArgRef()];
@@ -62,18 +84,20 @@ public sealed class AndStatement : Statement
 		return hashCode;
 	}
 
-	internal List<Statement> ConstituentStatements()
+	internal List<Statement> GetConstituentStatements()
 	{
 		List<Statement> constituents = [First, Second];
 
 		if (First is AndStatement firstStmt)
 		{
-			constituents.AddRange(firstStmt.ConstituentStatements());
+			constituents.AddRange(firstStmt.GetConstituentStatements());
+			constituents.Remove(First);
 		}
 
 		if (Second is AndStatement secondStmt)
 		{
-			constituents.AddRange(secondStmt.ConstituentStatements());
+			constituents.AddRange(secondStmt.GetConstituentStatements());
+			constituents.Remove(Second);
 		}
 
 		return constituents;
@@ -82,5 +106,24 @@ public sealed class AndStatement : Statement
 	public override string ToString()
 	{
 		return $"({First}) && ({Second})";
+	}
+
+	public override Statement Simplify() // computationally heavy right now
+	{
+		if ((First is not AndStatement) && (Second is not AndStatement)) return this;
+
+		var constituents = GetConstituentStatements();
+		var distinctConstituents = constituents.Distinct().ToArray();
+
+		if (constituents.Count == distinctConstituents.Length) return this;
+
+		AndStatement buildingStmt = new(distinctConstituents[0], distinctConstituents[1], true);
+
+		for (int i = 2; i < distinctConstituents.Length; i++)
+		{
+			buildingStmt = new(buildingStmt, distinctConstituents[i], true);
+		}
+
+		return buildingStmt;
 	}
 }
