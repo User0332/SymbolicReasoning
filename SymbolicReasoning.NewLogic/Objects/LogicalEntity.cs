@@ -4,6 +4,11 @@ public abstract class LogicalEntity : IEquatable<LogicalEntity>
 {
 	public abstract string Identifier { get; }
 
+	public override string ToString()
+	{
+		return Identifier;
+	}
+
 	public bool Equals(LogicalEntity? other)
 	{
 		return other is not null && GetType() == other.GetType() && Identifier == other.Identifier;

@@ -9,7 +9,7 @@ public static class DefaultAxioms
 		(inPostulate) => {
 			if (inPostulate is not MatchPostulate matchPostulate) return null; // if this is not a match postulate, we cannot safely draw any conclusions
 
-			return new MatchPostulate(new NotStatement(matchPostulate.Result), new NotStatement(matchPostulate.Predicate));
+			return new MatchPostulate(new NotStatement(matchPostulate.Result).Simplify(), new NotStatement(matchPostulate.Predicate).Simplify());
 		}
 	);
 
@@ -28,4 +28,10 @@ public static class DefaultAxioms
 			return new MatchPostulate(matchPostulate.Predicate, matchPostulate.Result);
 		}
 	);
+
+	public static readonly IEnumerable<IAxiom> AsEnumerable = [
+		AxiomOfContrapositivity,
+		AxiomOfBiconditionalApplication,
+		AxiomOfInseparability
+	];
 }

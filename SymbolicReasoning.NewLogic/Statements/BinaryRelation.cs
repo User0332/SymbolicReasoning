@@ -5,10 +5,10 @@ namespace SymbolicReasoning.NewLogic.Statements;
 
 public enum BinaryRelation
 {
-	[Description("E")]
-	Belongs,
-	[Description("==")]
-	Identity,
+	[Description("E")] BelongsTo,
+	[Description("==")] IsIdenticalTo,
+	[Description("c")] IsContainedWithin,
+
 }
 
 public static class BinaryRelationExtensions

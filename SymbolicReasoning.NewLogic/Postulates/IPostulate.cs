@@ -4,5 +4,7 @@ namespace SymbolicReasoning.NewLogic.Postulates;
 
 public interface IPostulate : IEquatable<IPostulate>
 {
-	public abstract Statement? ApplyTo(Statement statement);
+	public Statement? ApplyTo(Statement statement);
+
+	public IPostulate? TryChainTo(IPostulate next) => null;
 }

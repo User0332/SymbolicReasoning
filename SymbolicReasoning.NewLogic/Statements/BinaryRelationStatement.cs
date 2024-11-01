@@ -22,7 +22,12 @@ public class BinaryRelationStatement(LogicalEntity left, BinaryRelation op, Logi
 	}
 
 	public override int GetHashCode()
-	{
+	{		
 		return HashCode.Combine(First, Relation, Second);
+	}
+
+	public override string ToString()
+	{
+		return $"{First} {Relation.GetRepresentation()} {Second}";
 	}
 }

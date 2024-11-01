@@ -5,7 +5,7 @@ namespace SymbolicReasoning.NewLogic.Axioms;
 
 public class BasicAxiom(
 	Func<IPostulate, IPostulate?> transformer
-)
+) : IAxiom
 {
 	public IPostulate? Apply(IPostulate postulate)
 	{

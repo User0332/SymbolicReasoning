@@ -35,6 +35,11 @@ public class NotStatement(Statement inner) : Statement
 
 	public override int GetHashCode()
 	{
-		return HashCode.Combine(Inner, NotStatementHashMask);
+		return HashCode.Combine(Inner.Simplify(), NotStatementHashMask);
+	}
+
+	public override string ToString()
+	{
+		return $"!({Inner})";
 	}
 }

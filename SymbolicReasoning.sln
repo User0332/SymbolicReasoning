@@ -9,6 +9,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SymbolicReasoning.Tests", "
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SymbolicReasoning.NewLogic", "SymbolicReasoning.NewLogic\SymbolicReasoning.NewLogic.csproj", "{77E5B6C5-32DE-454E-8677-B17FFE911E15}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SymbolicReasoning.NewLogic.Tests", "SymbolicReasoning.NewLogic.Tests\SymbolicReasoning.NewLogic.Tests.csproj", "{508D29C0-59C4-48F8-8A7E-49D7F280FA09}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -27,6 +29,10 @@ Global
 		{77E5B6C5-32DE-454E-8677-B17FFE911E15}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{77E5B6C5-32DE-454E-8677-B17FFE911E15}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{77E5B6C5-32DE-454E-8677-B17FFE911E15}.Release|Any CPU.Build.0 = Release|Any CPU
+		{508D29C0-59C4-48F8-8A7E-49D7F280FA09}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{508D29C0-59C4-48F8-8A7E-49D7F280FA09}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{508D29C0-59C4-48F8-8A7E-49D7F280FA09}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{508D29C0-59C4-48F8-8A7E-49D7F280FA09}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

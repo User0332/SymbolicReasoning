@@ -7,8 +7,8 @@ public class MatchPostulate(
 	Statement predicate, Statement result
 ) : IPostulate
 {
-	public readonly Statement Predicate = predicate;
-	public readonly Statement Result = result;
+	public readonly Statement Predicate = predicate.Simplify();
+	public readonly Statement Result = result.Simplify();
 
 	public Statement? ApplyTo(Statement statement)
 	{
@@ -55,11 +55,27 @@ public class MatchPostulate(
 
 	public virtual bool Equals(IPostulate? otherPostulate)
 	{
-		return otherPostulate is MatchPostulate other && Predicate == other.Predicate && Result == other.Result;
+		return otherPostulate is MatchPostulate other && Predicate.Equals(other.Predicate) && Result.Equals(other.Result);
 	}
 
 	public override int GetHashCode()
 	{
 		return HashCode.Combine(GetType(), Predicate, Result);
+	}
+
+	public IPostulate? TryChainTo(IPostulate next)
+	{
+		if (next is not MatchPostulate nextMatcher) return null;
+
+		if (nextMatcher.Result.Equals(Predicate)) return null; // prevent infinite chaining
+
+		if (!nextMatcher.Predicate.Equals(Result)) return null; // not directly chainable
+
+		return new MatchPostulate(Predicate, nextMatcher.Result);
+	}
+
+	public override string ToString()
+	{
+		return $"{Predicate} -> {Result}";
 	}
 }
