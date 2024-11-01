@@ -98,50 +98,6 @@ public class SymbolicReasoner
 		return null;
 	}
 
-	public List<IStatement> SelectTruths(IEnumerable<IStatement> possibleTruths, Func<HashSet<IStatement>, bool>? extraSelector = null)
-	{
-		extraSelector ??= _ => true;
-
-		HashSet<IStatement> oldKnowledge = new(knowledgeBase); 
-	
-		List<IStatement> trueStatements = [];
-
-		foreach (var possibleTruth in possibleTruths)
-		{
-			knowledgeBase.Add(possibleTruth); // assume this as true, try to find a contradiction
-
-			int lastNumTruths = 0;
-			bool contradiction = false;
-
-			while (lastNumTruths != knowledgeBase.Count) // if the number of truths did not change after forward chaining, then we have deduced all truths
-			{
-				lastNumTruths = knowledgeBase.Count;
-
-				ForwardChain(1);
-
-				if (knowledgeBase.Contains(possibleTruth.Negate())) // try to find a contradiction
-				{
-					contradiction = true;
-					break;
-				}
-			}
-
-			ReloadSetMembers();
-
-			if (!contradiction && extraSelector(knowledgeBase) && !SetConstraintHasBeenViolated) // if this is true, then keep everything in the knowledge base by adding these conclusions to oldKnowledge
-			{
-				trueStatements.Add(possibleTruth);
-				oldKnowledge.UnionWith(knowledgeBase);
-				continue;
-			}
-
-			knowledgeBase.Clear();
-			knowledgeBase.UnionWith(oldKnowledge);
-		}
-
-		return trueStatements;
-	}
-
 	// TODO: remove the nesting hell
 	public void ForwardChain(int iterations = 1) // ForwardChain makes depth of 1 searches for new knowledge, therefore, more iterations are needed to gain deeper knowledge
 	{

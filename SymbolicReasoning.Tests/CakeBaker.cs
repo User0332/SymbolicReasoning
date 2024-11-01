@@ -14,14 +14,14 @@ class CakeBaker
 
 		LogicalObject alice = new("alice");
 		LogicalObject bob = new("bob");
+
 		LogicalObject carol = new("carol");
 
+		var aliceStmt = new ObjectBelongingStatement(alice, bakers).Negate();
+		var bobStmt = new ObjectBelongingStatement(carol, bakers);
+		var carolStmt = IStatement.Lie(bobStmt);
 
-		List<IStatement> possiblyTrue = [
-			new ObjectBelongingStatement(alice, bakers).Negate(), // Alice's statement
-			new ObjectBelongingStatement(carol, bakers), // Bob's statement
-			new ObjectBelongingStatement(carol, bakers).Negate(), // Carol's statement
-		];
+		List<IStatement> possiblyTrue = [ aliceStmt, bobStmt, carolStmt ];
 
 		SymbolicReasoner reasoningEngine = new();
 
@@ -32,5 +32,7 @@ class CakeBaker
 		Console.WriteLine(reasoningEngine.KnowledgeBaseToString());
 
 		Console.WriteLine($"Found that {trueStmt} is true");
+
+		Console.WriteLine($"Therefore, {bakers.Members.First()} baked the cake.");
 	}
 }

@@ -2,6 +2,8 @@
 
   <ItemGroup>
     <ProjectReference Include="..\SymbolicReasoning\SymbolicReasoning.csproj" />
+    <ProjectReference Include="..\SymbolicReasoning.NewLogic\SymbolicReasoning.NewLogic.csproj" />
+  
   </ItemGroup>
 
   <PropertyGroup>
