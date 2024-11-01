@@ -1,6 +1,6 @@
 namespace SymbolicReasoning.NewLogic.Objects;
 
-public interface ILogicalObject
+public interface ILogicalEntity
 {
 	public string Identifier { get; }
 }

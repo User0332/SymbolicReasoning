@@ -1,7 +1,11 @@
+using SymbolicReasoning.NewLogic.Objects;
+
 namespace SymbolicReasoning.NewLogic.Statements;
 
 public interface IStatement
 {
-	public bool Negated { get; }
-	public IStatement Negate();
+	public int ArgsConsumed { get; }
+	public IStatement WithArgRef(ILogicalEntity[] args);
+	public ILogicalEntity[] GetArgRef();
+	public IStatement Simplify() { return this; }
 }
