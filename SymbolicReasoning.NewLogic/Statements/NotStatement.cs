@@ -26,4 +26,9 @@ public class NotStatement(IStatement inner) : IStatement
 
 		return this;
 	}
+
+	public bool SchemaMatches(IStatement other)
+	{
+		return other is NotStatement notStmt && notStmt.Inner.SchemaMatches(Inner);
+	}
 }

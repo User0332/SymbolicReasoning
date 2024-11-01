@@ -3,7 +3,7 @@ using System.Reflection;
 
 namespace SymbolicReasoning.NewLogic.Statements;
 
-public enum Relation
+public enum BinaryRelation
 {
 	[Description("E")]
 	Belongs,
@@ -11,11 +11,11 @@ public enum Relation
 	Identity,
 }
 
-public static class RelationExtensions
+public static class BinaryRelationExtensions
 {
-	public static string GetRepresentation(this Relation rel)
+	public static string GetRepresentation(this BinaryRelation rel)
 	{
-		var memberInfo = typeof(Relation).GetMember(rel.ToString()).FirstOrDefault();
+		var memberInfo = typeof(BinaryRelation).GetMember(rel.ToString()).FirstOrDefault();
 
 		if (memberInfo is null) return string.Empty;
 		

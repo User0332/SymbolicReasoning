@@ -13,9 +13,7 @@ public class MatchPostulate(
 
 	public IStatement? ApplyTo(IStatement statement)
 	{
-		if (statement.GetType() != Predicate.GetType()) return null;
-
-		// match all indices
+		if (!statement.SchemaMatches(Predicate)) return null;
 
 		var argRef = statement.GetArgRef();
 

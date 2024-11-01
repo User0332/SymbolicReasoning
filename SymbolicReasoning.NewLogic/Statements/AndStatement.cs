@@ -18,4 +18,9 @@ public class AndStatement(IStatement left, IStatement right) : IStatement
 	{
 		return new AndStatement(First.WithArgRef(args[..First.ArgsConsumed]), Second.WithArgRef(args[First.ArgsConsumed..]));
 	}
+
+	public bool SchemaMatches(IStatement other)
+	{
+		return other is AndStatement andStmt && andStmt.First.SchemaMatches(First) && andStmt.Second.SchemaMatches(Second);
+	}
 }
