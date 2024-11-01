@@ -1,6 +1,6 @@
 namespace SymbolicReasoning.NewLogic.Objects;
 
-public class MatchEntity(string ident = "") : ILogicalEntity
+public class MatchEntity(string ident) : LogicalEntity
 {
-	public string Identifier => $"Match Entity {ident}";
+	public override string Identifier => ident;
 }

@@ -2,22 +2,23 @@ using SymbolicReasoning.NewLogic.Objects;
 
 namespace SymbolicReasoning.NewLogic.Statements;
 
-public class NotStatement(IStatement inner) : IStatement
+public class NotStatement(Statement inner) : Statement
 {
-	public int ArgsConsumed => Inner.ArgsConsumed;
-	public readonly IStatement Inner = inner;
+	const int NotStatementHashMask = 12092491;
+	public override int ArgsConsumed => Inner.ArgsConsumed;
+	public readonly Statement Inner = inner;
 
-	public ILogicalEntity[] GetArgRef()
+	public override LogicalEntity[] GetArgRef()
 	{
 		return Inner.GetArgRef();
 	}
 
-	public IStatement WithArgRef(ILogicalEntity[] args)
+	public override Statement WithArgRef(LogicalEntity[] args)
 	{
 		return new NotStatement(Inner.WithArgRef(args));
 	}
 
-	public IStatement Simplify()
+	public override Statement Simplify()
 	{
 		if (Inner is NotStatement innerStmt)
 		{
@@ -27,8 +28,13 @@ public class NotStatement(IStatement inner) : IStatement
 		return this;
 	}
 
-	public bool SchemaMatches(IStatement other)
+	public override bool SchemaMatches(Statement other)
 	{
 		return other is NotStatement notStmt && notStmt.Inner.SchemaMatches(Inner);
+	}
+
+	public override int GetHashCode()
+	{
+		return HashCode.Combine(Inner, NotStatementHashMask);
 	}
 }

@@ -2,25 +2,32 @@ using SymbolicReasoning.NewLogic.Objects;
 
 namespace SymbolicReasoning.NewLogic.Statements;
 
-public class AndStatement(IStatement left, IStatement right) : IStatement
+public class AndStatement(Statement left, Statement right) : Statement
 {
-	public int ArgsConsumed => First.ArgsConsumed+Second.ArgsConsumed;
+	const int AndStatementHashMask = 10827;
 
-	public readonly IStatement First = left;
-	public readonly IStatement Second = right;
+	public override int ArgsConsumed => First.ArgsConsumed+Second.ArgsConsumed;
 
-	public ILogicalEntity[] GetArgRef()
+	public readonly Statement First = left;
+	public readonly Statement Second = right;
+
+	public override LogicalEntity[] GetArgRef()
 	{
 		return [..First.GetArgRef(), ..Second.GetArgRef()];
 	}
 
-	public IStatement WithArgRef(ILogicalEntity[] args)
+	public override Statement WithArgRef(LogicalEntity[] args)
 	{
 		return new AndStatement(First.WithArgRef(args[..First.ArgsConsumed]), Second.WithArgRef(args[First.ArgsConsumed..]));
 	}
 
-	public bool SchemaMatches(IStatement other)
+	public override bool SchemaMatches(Statement other)
 	{
 		return other is AndStatement andStmt && andStmt.First.SchemaMatches(First) && andStmt.Second.SchemaMatches(Second);
+	}
+
+	public override int GetHashCode()
+	{
+		return HashCode.Combine(First, Second, AndStatementHashMask);
 	}
 }

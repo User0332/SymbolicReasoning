@@ -2,7 +2,7 @@ using SymbolicReasoning.NewLogic.Statements;
 
 namespace SymbolicReasoning.NewLogic.Postulates;
 
-public interface IPostulate
+public interface IPostulate : IEquatable<IPostulate>
 {
-	public IStatement? ApplyTo(IStatement statement);
+	public abstract Statement? ApplyTo(Statement statement);
 }

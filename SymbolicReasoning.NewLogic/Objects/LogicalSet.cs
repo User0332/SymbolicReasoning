@@ -1,6 +1,6 @@
 namespace SymbolicReasoning.NewLogic.Objects;
 
-public class LogicalSet(string ident) : ILogicalEntity
+public class LogicalSet(string ident) : LogicalEntity
 {
-	public string Identifier => ident;
+	public override string Identifier => ident;
 }

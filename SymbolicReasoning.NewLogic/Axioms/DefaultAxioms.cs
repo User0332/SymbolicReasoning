@@ -13,7 +13,19 @@ public static class DefaultAxioms
 		}
 	);
 
-	// public static readonly BasicAxiom AxiomOfInseparability = new(
+	public static readonly BasicAxiom AxiomOfInseparability = new(
+		(inPostulate) => {
+			if (inPostulate is not BiconditionalMatchPostulate matchPostulate) return null;
 
-	// );
+			return new BiconditionalMatchPostulate(matchPostulate.Result, matchPostulate.Predicate);
+		}
+	);
+
+	public static readonly BasicAxiom AxiomOfBiconditionalApplication = new(
+		(inPostulate) => {
+			if (inPostulate is not BiconditionalMatchPostulate matchPostulate) return null;
+
+			return new MatchPostulate(matchPostulate.Predicate, matchPostulate.Result);
+		}
+	);
 }

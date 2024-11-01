@@ -1,17 +1,16 @@
-using System.Security.Cryptography.X509Certificates;
 using SymbolicReasoning.NewLogic.Objects;
 using SymbolicReasoning.NewLogic.Statements;
 
 namespace SymbolicReasoning.NewLogic.Postulates;
 
 public class MatchPostulate(
-	IStatement predicate, IStatement result
+	Statement predicate, Statement result
 ) : IPostulate
 {
-	public readonly IStatement Predicate = predicate;
-	public readonly IStatement Result = result;
+	public readonly Statement Predicate = predicate;
+	public readonly Statement Result = result;
 
-	public IStatement? ApplyTo(IStatement statement)
+	public Statement? ApplyTo(Statement statement)
 	{
 		if (!statement.SchemaMatches(Predicate)) return null;
 
@@ -19,27 +18,32 @@ public class MatchPostulate(
 
 		var predicateArgRef = Predicate.GetArgRef();
 
-		Queue<ILogicalEntity> matches = [];
+		Dictionary<string, LogicalEntity> matches = [];
 
 		for (int i = 0; i < argRef.Length; i++)
 		{
-			if (predicateArgRef[i] is MatchEntity)
+			if (predicateArgRef[i] is MatchEntity match)
 			{
-				matches.Enqueue(argRef[0]);
+				matches[match.Identifier] = argRef[0];
 				continue;
 			}
 			
-			if (argRef[i] != predicateArgRef[i]) return null;
+			if (!argRef[i].Equals(predicateArgRef[i])) return null; // statement signatures don't match
 		}
 
 		var resultArgRef = Result.GetArgRef();
-		List<ILogicalEntity> newArgRef = [];
+		List<LogicalEntity> newArgRef = [];
 
 		for (int i = 0; i < resultArgRef.Length; i++)
 		{
-			if (resultArgRef[i] is MatchEntity)
+			if (resultArgRef[i] is MatchEntity match)
 			{
-				newArgRef.Add(matches.Dequeue());
+				matches.Remove(match.Identifier, out var matchedEntity);
+
+				if (matchedEntity is null) return null;
+
+				newArgRef.Add(matchedEntity);
+
 				continue;
 			}
 
@@ -47,5 +51,15 @@ public class MatchPostulate(
 		}
 
 		return Result.WithArgRef([..newArgRef]);
+	}
+
+	public virtual bool Equals(IPostulate? otherPostulate)
+	{
+		return otherPostulate is MatchPostulate other && Predicate == other.Predicate && Result == other.Result;
+	}
+
+	public override int GetHashCode()
+	{
+		return HashCode.Combine(GetType(), Predicate, Result);
 	}
 }
