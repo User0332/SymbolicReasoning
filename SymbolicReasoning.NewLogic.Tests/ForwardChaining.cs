@@ -9,24 +9,31 @@ class ForwardChaining
 	{
 		List<IPostulate> postulates = [
 			new MatchPostulate(
-				new BinaryRelationStatement(x, BelongsTo, Scientists),
-				new BinaryRelationStatement(x, BelongsTo, Humans)
+				predicate: new BinaryRelationStatement(x, BelongsTo, Scientists),
+				result: new BinaryRelationStatement(x, BelongsTo, Humans)
 			),
 
 			new BiconditionalMatchPostulate(
-				new NotStatement(new BinaryRelationStatement(x, BelongsTo, Humans)),
-				new BinaryRelationStatement(x, BelongsTo, Aliens)
+				first: new BinaryRelationStatement(x, BelongsTo, Humans).Negate(),
+				second: new BinaryRelationStatement(x, BelongsTo, Aliens)
 			),
 
 			new MatchPostulate(
-				new BinaryRelationStatement(x, BelongsTo, Biologists),
-				new BinaryRelationStatement(x, BelongsTo, Scientists)
+				predicate: new BinaryRelationStatement(x, BelongsTo, Biologists),
+				result: new BinaryRelationStatement(x, BelongsTo, Scientists)
+			),
+
+			new MatchPostulate(
+				predicate: new BinaryRelationStatement(George, BelongsTo, Humans).And(
+					new BinaryRelationStatement(Grunkle, BelongsTo, Aliens)
+				),
+				result: new BinaryRelationStatement(Grunkle, IsIdenticalTo, George).Negate()
 			)
 		];
 
 		List<Statement> statements = [
 			new BinaryRelationStatement(George, BelongsTo, Biologists),
-			// new BinaryRelationStatement(Grunkle, BelongsTo, Aliens)
+			new BinaryRelationStatement(Grunkle, BelongsTo, Aliens)
 		];
 
 		var engine = new SimpleReasoningEngine();

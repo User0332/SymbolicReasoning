@@ -78,4 +78,52 @@ public class MatchPostulate(
 	{
 		return $"{Predicate} -> {Result}";
 	}
+
+	public static bool MatchesPredicate(Statement predicate, Statement stmt)
+	{
+		if (!predicate.SchemaMatches(stmt)) return false;
+
+		var argRef = stmt.GetArgRef();
+
+		var predicateArgRef = predicate.GetArgRef();
+
+		for (int i = 0; i < argRef.Length; i++)
+		{
+			if (predicateArgRef[i] is MatchEntity) continue;
+			
+			if (!argRef[i].Equals(predicateArgRef[i])) return false; // statement signatures don't match
+		}
+
+		return true;
+	}
+
+	public static (bool Matches, AndStatement ResolvedStatement) GetMatchForAndPredicate(AndStatement predicate, IEnumerable<Statement> statements)
+	{
+		foreach (var stmt in statements)
+		{
+			Statement other;
+
+			if (MatchesPredicate(predicate.First, stmt)) other = predicate.Second;
+			else if (MatchesPredicate(predicate.Second, stmt)) other = predicate.First;
+			else continue;
+
+			if (other is AndStatement innerPredicate)
+			{
+				var (matches, resolvedStatement) = GetMatchForAndPredicate(innerPredicate, statements);
+
+				if (!matches) return (false, null!);
+
+				return (true, new(stmt, resolvedStatement));
+			}
+			else
+			{
+				foreach (var secondStmt in statements)
+				{
+					if (MatchesPredicate(other, secondStmt)) return (true, new(stmt, secondStmt));
+				}
+			}
+		}
+
+		return (false, null!);
+	}
 }

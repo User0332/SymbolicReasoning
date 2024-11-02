@@ -1,5 +1,6 @@
 ﻿using System.Runtime.InteropServices;
 using SymbolicReasoning.NewLogic.Axioms;
+using SymbolicReasoning.NewLogic.Postulates;
 using SymbolicReasoning.NewLogic.Statements;
 
 namespace SymbolicReasoning.NewLogic;
@@ -65,6 +66,19 @@ public class SimpleReasoningEngine(KnowledgeBase knowledgeBase)
 			
 			foreach (var postulate in KnowledgeBase.Postulates)
 			{
+				if (postulate is MatchPostulate matchPostulate && matchPostulate.Predicate is AndStatement andPredicate)
+				{
+					var (foundMatch, matcherStmt) = MatchPostulate.GetMatchForAndPredicate(andPredicate, stmtsCopy);
+
+					if (!foundMatch) continue;
+
+					KnowledgeBase.Statements.Add(
+						postulate.ApplyTo(matcherStmt)!
+					);
+
+					continue;
+				}
+
 				var newStmt = postulate.ApplyTo(stmt);
 
 				if (newStmt is null) continue;

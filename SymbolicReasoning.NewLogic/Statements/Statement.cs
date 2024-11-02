@@ -22,4 +22,7 @@ public abstract class Statement : IEquatable<Statement>
 	}
 
 	public abstract override int GetHashCode();
+
+	public Statement Negate() => new NotStatement(this).Simplify();
+	public Statement And(Statement other) => new AndStatement(this, other).Simplify();
 }
