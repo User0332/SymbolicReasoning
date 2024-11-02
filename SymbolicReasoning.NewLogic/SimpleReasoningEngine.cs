@@ -1,5 +1,6 @@
 ﻿using System.Runtime.InteropServices;
 using SymbolicReasoning.NewLogic.Axioms;
+using SymbolicReasoning.NewLogic.Objects;
 using SymbolicReasoning.NewLogic.Postulates;
 using SymbolicReasoning.NewLogic.Statements;
 
@@ -100,13 +101,80 @@ public class SimpleReasoningEngine(KnowledgeBase knowledgeBase)
 			ForwardChainStatementsOneGen();
 
 			numStmts = KnowledgeBase.Statements.Count;
-
-			Console.WriteLine($"Generation complete, {numStmts} statements known");
 		}
 	}
 
-	public bool BackwardChain(Statement target)
+	bool BackwardChainUsingPostulates(Statement target, Statement originalTarget)
 	{
-		return bool.Parse("false");
+		if (KnowledgeBase.Statements.Contains(target)) return true;
+
+		foreach (var postulate in KnowledgeBase.Postulates)
+		{
+			if (postulate is MatchPostulate matchPostulate)
+			{
+				if (MatchPostulate.MatchesPredicateLikeStatement(matchPostulate.Result, target))
+				{
+					MatchPostulate reversed = new(matchPostulate.Result, matchPostulate.Predicate);
+					// Dictionary<string, LogicalEntity> matchPairs = [];
+
+					// if (!matchPostulate.Result.SchemaMatches(target)) return false;
+
+					// var argRef = target.GetArgRef();
+
+					// var resultArgRef = matchPostulate.Result.GetArgRef();
+
+					// for (int i = 0; i < argRef.Length; i++)
+					// {
+					// 	if (resultArgRef[i] is MatchEntity matchEntity)
+					// 	{
+					// 		matchPairs.Add(matchEntity.Identifier, argRef[i]);
+					// 	}
+						
+					// 	if (!argRef[i].Equals(resultArgRef[i])) return false; // statement signatures don't match
+					// }
+
+					var matchedPredicate = reversed.ApplyTo(target)!;
+
+					if (matchedPredicate.Equals(originalTarget)) continue;
+
+					if (BackwardChainUsingPostulates(matchedPredicate, originalTarget))
+					{
+						KnowledgeBase.Statements.Add(target);
+
+						return true;
+					}
+				}
+			}
+		}
+
+		return false;
+	}
+
+	bool BackwardChainNaive(Statement target)
+	{
+		int lastNumStmts = 0;
+		int numStmts = KnowledgeBase.Statements.Count;
+
+		if (KnowledgeBase.Statements.Contains(target)) return true;
+
+		while (numStmts > lastNumStmts)
+		{
+			lastNumStmts = numStmts;
+
+			ForwardChainStatementsOneGen();
+
+			if (KnowledgeBase.Statements.Contains(target)) return true;
+
+			numStmts = KnowledgeBase.Statements.Count;
+		}
+
+		return false;
+	}
+
+	public bool BackwardChain(Statement targetStmt)
+	{
+		var target = targetStmt.Simplify();
+
+		return BackwardChainUsingPostulates(target, target);
 	}
 }

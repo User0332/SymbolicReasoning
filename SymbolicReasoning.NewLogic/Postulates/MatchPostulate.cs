@@ -79,13 +79,13 @@ public class MatchPostulate(
 		return $"{Predicate} -> {Result}";
 	}
 
-	public static bool MatchesPredicate(Statement predicate, Statement stmt)
+	public static bool MatchesPredicateLikeStatement(Statement predicateLikeStmt, Statement stmt)
 	{
-		if (!predicate.SchemaMatches(stmt)) return false;
+		if (!predicateLikeStmt.SchemaMatches(stmt)) return false;
 
 		var argRef = stmt.GetArgRef();
 
-		var predicateArgRef = predicate.GetArgRef();
+		var predicateArgRef = predicateLikeStmt.GetArgRef();
 
 		for (int i = 0; i < argRef.Length; i++)
 		{
@@ -103,8 +103,8 @@ public class MatchPostulate(
 		{
 			Statement other;
 
-			if (MatchesPredicate(predicate.First, stmt)) other = predicate.Second;
-			else if (MatchesPredicate(predicate.Second, stmt)) other = predicate.First;
+			if (MatchesPredicateLikeStatement(predicate.First, stmt)) other = predicate.Second;
+			else if (MatchesPredicateLikeStatement(predicate.Second, stmt)) other = predicate.First;
 			else continue;
 
 			if (other is AndStatement innerPredicate)
@@ -119,7 +119,7 @@ public class MatchPostulate(
 			{
 				foreach (var secondStmt in statements)
 				{
-					if (MatchesPredicate(other, secondStmt)) return (true, new(stmt, secondStmt));
+					if (MatchesPredicateLikeStatement(other, secondStmt)) return (true, new(stmt, secondStmt));
 				}
 			}
 		}
